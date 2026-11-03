@@ -602,6 +602,76 @@
         .avail .dot { animation: none; }
         * { transition-duration: .01ms !important; }
       }
+
+      /* ================= CINEMATIC DARK THEME (v2) ================= */
+      :root, :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0a0908; --bg-raise: #14120f; --bg-sink: #060505;
+        --ink: #f4efe5; --ink-soft: #b8af9f; --ink-faint: #7b7365; --line: #26221c;
+        --accent: #f2b13c; --accent-ink: #1a1104; --accent-text: #f2b13c; --amber: #f2b13c;
+        --card-shadow: 0 1px 2px rgba(0,0,0,.6), 0 22px 44px -24px rgba(0,0,0,.95);
+      }
+      body { background: var(--bg); }
+      /* film grain + vignette */
+      body::before {
+        content: ""; position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: .07;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+        animation: grain 1.2s steps(6) infinite;
+      }
+      @keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,2%)} 40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,-1%)} 80%{transform:translate(3%,3%)} 100%{transform:translate(0,0)} }
+      @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+      header.nav { background: color-mix(in srgb, var(--bg) 78%, transparent); border-bottom-color: rgba(255,255,255,.06); }
+      /* hero: bigger type, warm key light */
+      .hero { position: relative; padding: 88px 0 12px; }
+      .hero::before {
+        content: ""; position: absolute; z-index: -1; inset: -120px -30vw auto; height: 760px; pointer-events: none;
+        background: radial-gradient(50% 55% at 72% 38%, rgba(242,177,60,.16), transparent 70%),
+                    radial-gradient(40% 50% at 15% 20%, rgba(242,177,60,.06), transparent 70%);
+      }
+      h1.display { font-size: clamp(3rem, 7.4vw, 6.4rem); line-height: .94; letter-spacing: -0.045em; }
+      h1.display em { text-shadow: 0 0 40px rgba(242,177,60,.35); }
+      .hero-sub { font-size: 1.08rem; max-width: 34em; }
+      .portrait-card { border: 1px solid rgba(255,255,255,.08); box-shadow: 0 40px 80px -30px rgba(0,0,0,.95), 0 0 0 1px rgba(242,177,60,.06); }
+      .portrait-card img { filter: contrast(1.05) saturate(.9); }
+      .float-chip { background: rgba(20,18,15,.82); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.1); }
+      .stats { border: 1px solid var(--line); background: var(--line); }
+      .stat { background: var(--bg-raise); }
+      .stat b { color: var(--ink); }
+      /* showreel: letterboxed, full-bleed feel */
+      .reel { margin-top: 72px; }
+      .reel-frame { border: 1px solid rgba(255,255,255,.07); box-shadow: 0 50px 100px -40px rgba(0,0,0,1), 0 0 120px -40px rgba(242,177,60,.25); }
+      .reel-frame::before, .reel-frame::after { content: ""; position: absolute; inset-inline: 0; height: 5.5%; background: #000; z-index: 3; pointer-events: none; }
+      .reel-frame::before { top: 0; } .reel-frame::after { bottom: 0; }
+      /* sections */
+      section.block { padding-top: 96px; }
+      h2.sec-title { font-size: clamp(2.2rem, 4.8vw, 3.6rem); letter-spacing: -0.035em; line-height: 1; }
+      .sec-label { color: var(--accent-text); }
+      .tl-sep { opacity: .55; }
+      /* work: grid instead of carousel */
+      .car-viewport { overflow: visible; padding: 0; margin: 0; }
+      .car-track { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; transform: none !important; transition: none; }
+      .cslide { opacity: 1 !important; transform: none !important; flex-basis: auto !important; border-color: rgba(255,255,255,.07); transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease; }
+      .cslide:hover { transform: translateY(-4px) !important; border-color: rgba(242,177,60,.45); box-shadow: 0 30px 60px -30px rgba(0,0,0,1), 0 0 0 1px rgba(242,177,60,.25); }
+      .cposter img.cover-photo { transition: transform .6s ease; }
+      .cslide:hover .cposter img.cover-photo { transform: scale(1.04); }
+      .car-controls { display: none !important; }
+      @media (max-width: 760px) { .car-track { grid-template-columns: 1fr; } }
+      /* cards */
+      .step, .quote-card, details, .proof-card { border-color: rgba(255,255,255,.07) !important; }
+      .contact { border: 1px solid rgba(242,177,60,.18); }
+
+      .tq { position: relative; margin: 34px 0 0; padding: clamp(28px, 5vw, 56px); border-radius: 22px; overflow: hidden;
+            background: linear-gradient(140deg, rgba(242,177,60,.10), rgba(20,18,15,.9) 45%), var(--bg-raise);
+            border: 1px solid rgba(242,177,60,.2); box-shadow: var(--card-shadow); }
+      .tq-mark { position: absolute; top: -.18em; right: .12em; font-size: clamp(9rem, 20vw, 16rem); font-weight: 900; line-height: 1; color: rgba(242,177,60,.12); pointer-events: none; }
+      .tq blockquote { margin: 0; max-width: 62em; position: relative; }
+      .tq blockquote p { margin: 0 0 14px; color: var(--ink-soft); font-size: 15.5px; line-height: 1.65; max-width: 46em; }
+      .tq .tq-lead { color: var(--ink); font-size: clamp(1.35rem, 2.6vw, 2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 22px; max-width: 30em; }
+      .tq figcaption { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+      .tq-av { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 15px; background: var(--accent); color: var(--accent-ink); flex: none; }
+      .tq figcaption a { text-decoration: none; } .tq figcaption a:hover b { color: var(--accent-text); }
+      .tq-role { font-size: 13px; color: var(--ink-faint); }
+      .tq-src { margin-inline-start: auto; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
     </style>
   </head>
   <body>
@@ -619,7 +689,7 @@
           <a href="#faq">FAQ</a>
         </nav>
         <div class="avail"><span class="dot" aria-hidden="true"></span><span class="txt">Available for new projects</span></div>
-        <a class="btn btn-solid btn-sm" href="https://www.linkedin.com/in/reza-jafari-video" target="_blank" rel="noopener">Hire me</a>
+        <a class="btn btn-solid btn-sm" href="#contact">Hire me</a>
       </div>
     </header>
 
@@ -641,8 +711,8 @@
               DaVinci Resolve</strong>, accelerated with AI video workflows.
             </p>
             <div class="hero-cta">
-              <a class="btn btn-solid" href="https://www.linkedin.com/in/reza-jafari-video" target="_blank" rel="noopener">Start a project ↗</a>
-              <a class="btn btn-ghost" href="#videos">Watch the work</a>
+              <a class="btn btn-solid" href="#contact">Start a project</a>
+              <a class="btn btn-ghost" href="#showreel">▶ Watch the reel</a>
             </div>
             <p class="hero-note">New projects start with a <b>free sample edit</b> on your own footage — judge the work, not the pitch.</p>
           </div>
@@ -657,10 +727,6 @@
                 <span class="tc mono">EST. 10+ YRS</span>
               </figcaption>
             </figure>
-            <div class="float-chip chip-a">
-              <span class="n">1M+</span>
-              <span class="t">views on one Instagram video — the anniversary film</span>
-            </div>
             <div class="float-chip chip-b">
               <span class="n">YT</span>
               <span class="t">true-crime edits published for US documentary channels</span>
@@ -679,34 +745,6 @@
           <div class="stat"><b>EN · FA</b><span>content edited in English and Persian, for clients worldwide</span></div>
         </div>
       </div>
-
-      <!-- ============ RESULTS / SOCIAL PROOF ============ -->
-      <div class="tl-sep" aria-hidden="true" style="--ph:16%"><span class="tl-ph"></span><span class="tl-tc mono">TC 00:00:03:07</span></div>
-      <section class="block" id="results" style="padding-top:56px">
-        <p class="sec-label">Proof, not promises</p>
-        <div class="sec-head"><h2 class="sec-title">Results the work has already earned</h2></div>
-        <p class="sec-sub">Every number below comes from a real, published project — the same projects you can watch further down this page.</p>
-        <div class="proof">
-          <article class="proof-card">
-            <div class="metric">1M<em>+</em></div>
-            <h3>Views on a single short film</h3>
-            <p>A personal anniversary video — shot, cut and paced for emotion first — passed one million views on Instagram with no ad spend behind it.</p>
-            <span class="src">Instagram · Short-form</span>
-          </article>
-          <article class="proof-card">
-            <div class="metric">Published</div>
-            <h3>Long-form edits live on YouTube</h3>
-            <p>True-crime episodes edited for US documentary channels, released after multi-round quality control — including “Ocala PD”, which plays in full on this page.</p>
-            <span class="src">YouTube · True crime</span>
-          </article>
-          <article class="proof-card">
-            <div class="metric">Ongoing</div>
-            <h3>A brand series, not one-offs</h3>
-            <p>Recurring commercial work for the HuuM granola brand — scenario-led spots plus a fixed animated outro template that gives every release the same identity.</p>
-            <span class="src">HuuM · Brand ads</span>
-          </article>
-        </div>
-      </section>
 
       <!-- ============ SHOWREEL ============ -->
       <div class="reel" id="showreel">
@@ -738,9 +776,9 @@
       <!-- ============ VIDEO CAROUSEL ============ -->
       <div class="tl-sep" aria-hidden="true" style="--ph:58%"><span class="tl-ph"></span><span class="tl-tc mono">TC 00:00:12:19</span></div>
       <section class="block" id="videos">
-        <p class="sec-label">Featured videos</p>
-        <div class="sec-head"><h2 class="sec-title">On rotation</h2></div>
-        <p class="sec-sub">Four signature pieces, one of each kind I cut — my most-viewed true-crime edit, the million-view anniversary reel, an ongoing brand commercial series and a podcast edit — cycling on their own. Use the arrows to browse; click any slide to watch it.</p>
+        <p class="sec-label">Selected work</p>
+        <div class="sec-head"><h2 class="sec-title">The work</h2></div>
+        <p class="sec-sub">One of each kind I cut: true crime, short-form, brand ads and podcast. Click any piece to watch it.</p>
 
         <div class="carousel" id="carousel" aria-roledescription="carousel" aria-label="Featured videos">
           <div class="car-viewport">
@@ -837,7 +875,8 @@
         <div class="ticker-track" id="tickerTrack">
           <span>Premiere Pro <i>◆</i></span><span>After Effects <i>◆</i></span><span>DaVinci Resolve <i>◆</i></span>
           <span>Runway <i>◆</i></span><span>Kling <i>◆</i></span><span>Luma Dream Machine <i>◆</i></span>
-          <span>Midjourney <i>◆</i></span><span>Higgsfield <i>◆</i></span><span>Suno <i>◆</i></span>
+          <span>Seedance <i>◆</i></span><span>Midjourney <i>◆</i></span><span>Nano Banana <i>◆</i></span><span>Higgsfield <i>◆</i></span>
+          <span>ElevenLabs <i>◆</i></span><span>Sync.so <i>◆</i></span><span>Suno <i>◆</i></span>
           <span>Kinetic Typography <i>◆</i></span><span>Sound Design <i>◆</i></span><span>Retention Pacing <i>◆</i></span>
         </div>
       </div>
@@ -885,8 +924,8 @@
             <span class="idx">05</span>
             <h3>AI video &amp; motion design</h3>
             <div class="svc-text">
-              <p>Generative b-roll, scenes and sound with Runway, Kling, Luma, Midjourney, Higgsfield and Suno — blended invisibly into real footage.</p>
-              <div class="svc-tags"><span class="tag">AI b-roll</span><span class="tag">Motion graphics</span><span class="tag">Sound design</span></div>
+              <p>Fully AI-generated ads, recurring AI characters and AI UGC-style spots — or generative b-roll blended invisibly into real footage. Built with Kling, Seedance, Runway, Higgsfield, Midjourney and Nano Banana, voiced with ElevenLabs and Sync.so lip-sync, scored with Suno.</p>
+              <div class="svc-tags"><span class="tag">AI video ads</span><span class="tag">AI characters</span><span class="tag">AI UGC</span><span class="tag">AI b-roll</span><span class="tag">Motion graphics</span></div>
             </div>
           </div>
         </div>
@@ -902,7 +941,7 @@
           <article class="step">
             <div class="num">STEP 01</div>
             <h3>Send your footage</h3>
-            <p>Message me on LinkedIn with a link to your raw files — Drive, Dropbox, WeTransfer, whatever you already use. Add any references or notes you have; rough is fine.</p>
+            <p>Email me or message me on LinkedIn with a link to your raw files — Drive, Dropbox, WeTransfer, whatever you already use. Add any references or notes you have; rough is fine.</p>
             <div class="svc-tags"><span class="tag">Any platform</span><span class="tag">Free sample first</span></div>
           </article>
           <article class="step">
@@ -929,29 +968,21 @@
       <!-- ============ TESTIMONIALS ============ -->
       <div class="tl-sep" aria-hidden="true" style="--ph:24%"><span class="tl-ph"></span><span class="tl-tc mono">TC 00:00:37:09</span></div>
       <section class="block" id="testimonials">
-        <p class="sec-label">Kind words</p>
-        <div class="sec-head"><h2 class="sec-title">Word on the work</h2></div>
-        <p class="sec-sub">One public reaction, quoted exactly — and, in my own words, how the repeat work actually runs. No borrowed reviews, no invented endorsements.</p>
-        <div class="quotes">
-          <article class="quote-card">
-            <div class="mark" aria-hidden="true">“</div>
-            <blockquote>1 million views.. DANGGG</blockquote>
-            <p class="note">The reaction on LinkedIn the day the anniversary film's numbers landed — the same short film featured at the top of this page.</p>
-            <div class="who"><b>Talha Shaikh</b><span>LinkedIn · on the anniversary video</span></div>
-          </article>
-          <article class="quote-card">
-            <p class="sec-label" style="margin:0">In my words · True crime</p>
-            <p class="fact">My episodes clear multi-round QC and get published — not just delivered.</p>
-            <p class="note">The true-crime work runs through the channels' own review pipeline: reviewer notes, my fixes, re-checks — then the episode ships on schedule, like “Ocala PD” in October 2026. That pipeline is why the channels keep sending cases.</p>
-            <div class="who"><b>The workflow</b><span>US YouTube channels · recurring remote work</span></div>
-          </article>
-          <article class="quote-card">
-            <p class="sec-label" style="margin:0">In my words · Brand work</p>
-            <p class="fact">Single spots grew into an ongoing series.</p>
-            <p class="note">The HuuM collaboration started as one-off ads and became a running series with its own format and a fixed animated outro that I built for the brand — the pattern I aim for with every client: a first project that earns the next one.</p>
-            <div class="who"><b>The pattern</b><span>HuuM · @huumproducts · ongoing partnership</span></div>
-          </article>
-        </div>
+        <p class="sec-label">Client word</p>
+        <div class="sec-head"><h2 class="sec-title">What clients say</h2></div>
+        <figure class="tq">
+          <div class="tq-mark" aria-hidden="true">&ldquo;</div>
+          <blockquote>
+            <p class="tq-lead">The edit he produced was simply beautiful &mdash; the final result was top quality and stood out instantly.</p>
+            <p>You can tell Reza is a professional straight from the start. He was easy to communicate with, understood the task right away and delivered well ahead of time. More importantly, the edit he produced was simply beautiful. From eye-catching visuals and smooth transitions to engaging music and spot-on captions, the final result was top quality and stood out instantly.</p>
+            <p>You can see he&rsquo;s got proven experience and knows how to create edits that grab attention and deliver results. My experience working with him has been absolutely positive. If you&rsquo;re looking to grow your brand, attract customers or simply share high-impact videos, Reza is a safe choice and someone I can fully recommend.</p>
+          </blockquote>
+          <figcaption>
+            <span class="tq-av" aria-hidden="true">TL</span>
+            <span><a href="https://www.linkedin.com/in/tomasloucky/" target="_blank" rel="noopener"><b>Tomas Loucky</b></a><br /><span class="tq-role">Founder, Epixtory &middot; London, UK</span></span>
+            <span class="tq-src mono">LinkedIn recommendation</span>
+          </figcaption>
+        </figure>
       </section>
 
       <!-- ============ ABOUT ============ -->
@@ -982,7 +1013,8 @@
               <h3>AI pipeline</h3>
               <div class="kit-list">
                 <span class="tag">Runway</span><span class="tag">Kling</span><span class="tag">Luma Dream Machine</span>
-                <span class="tag">Midjourney</span><span class="tag">Higgsfield</span><span class="tag">Suno</span>
+                <span class="tag">Seedance</span><span class="tag">Higgsfield</span><span class="tag">Midjourney</span>
+                <span class="tag">Nano Banana</span><span class="tag">ElevenLabs</span><span class="tag">Sync.so</span><span class="tag">Suno</span>
               </div>
             </div>
             <div class="kit-group">
@@ -1024,7 +1056,7 @@
           </details>
           <details>
             <summary>Do you work with AI tools? Will my video look artificial?<span class="plus" aria-hidden="true">+</span></summary>
-            <div class="a"><p>I use Runway, Kling, Luma, Midjourney, Higgsfield and Suno for b-roll, scenes and sound where they genuinely help — always blended into real footage and finished by hand in Premiere Pro, After Effects and DaVinci Resolve. The goal is invisible assistance, never a synthetic look.</p></div>
+            <div class="a"><p>Yes — in two ways. I build fully AI-generated ads and recurring AI characters with Kling, Seedance, Runway, Higgsfield, Midjourney and Nano Banana, voiced with ElevenLabs and lip-synced with Sync.so. And I blend AI b-roll and scenes into real footage where it helps. Either way, everything is finished by hand in Premiere Pro, After Effects and DaVinci Resolve, so it never looks cheap or synthetic.</p></div>
           </details>
           <details>
             <summary>Which languages and time zones do you cover?<span class="plus" aria-hidden="true">+</span></summary>
@@ -1036,9 +1068,10 @@
       <!-- ============ FINAL CTA ============ -->
       <section class="contact" id="contact">
         <h2>Have footage?<br />Let's cut something people finish.</h2>
-        <p>Send me a message on LinkedIn with a link to your raw footage — I'll come back with honest notes and, if it's a fit, a free sample edit. The full portfolio library, including project files and more samples, lives on Playbook.</p>
+        <p>Email me at <a href="mailto:inatsio@gmail.com">inatsio@gmail.com</a> or message me on LinkedIn with a link to your raw footage — I'll come back with honest notes and, if it's a fit, a free sample edit. The full portfolio library, including project files and more samples, lives on Playbook.</p>
         <div class="contact-actions">
           <a class="btn btn-solid" href="https://www.linkedin.com/in/reza-jafari-video" target="_blank" rel="noopener">Message me on LinkedIn ↗</a>
+          <a class="btn btn-ghost" href="mailto:inatsio@gmail.com">Email me ↗</a>
           <a class="btn btn-ghost" href="https://www.playbook.com/s/fastedit/RezaJafari" target="_blank" rel="noopener">Browse the Playbook library ↗</a>
         </div>
         <div class="contact-meta mono">
@@ -1056,6 +1089,7 @@
           <span>© <span id="yr">2026</span> Mohammadreza Jafari — Video Editor &amp; Motion Designer</span>
           <span>
             <a href="https://www.linkedin.com/in/reza-jafari-video" target="_blank" rel="noopener">LinkedIn</a> ·
+            <a href="mailto:inatsio@gmail.com">Email</a> ·
             <a href="https://www.playbook.com/s/fastedit/RezaJafari" target="_blank" rel="noopener">Playbook</a> ·
             <a href="#showreel">Showreel</a>
           </span>

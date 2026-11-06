@@ -206,6 +206,14 @@ body.lb-open{overflow:hidden}
 .back{font-size:12px;color:var(--soft);display:inline-flex;gap:8px;margin-bottom:12px}
 .back:hover{color:var(--accent)}
 .shorts.four{grid-template-columns:repeat(4,1fr)}
+
+/* inline playback */
+iframe.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;background:#000}
+.is-playing .play,.is-playing .badge,.is-playing .big,.is-playing .ptitle{display:none}
+.is-playing{cursor:default}
+.card.is-ig .thumb{aspect-ratio:4/5}
+.card.is-ig iframe.inl{background:#fff}
+.pv-note{position:absolute;inset:auto 12px 12px 12px;z-index:7;background:#0A0E0FEE;border:1px solid var(--accent);color:var(--text);font-size:12px;line-height:1.5;padding:10px 12px;border-radius:8px}
 @media(max-width:760px){.more{grid-template-columns:1fr;gap:28px}.shorts.four{grid-template-columns:1fr 1fr}.counts b{font-size:32px}}
 @media(max-width:760px){
   .links>a:not(.navcta){display:none}
@@ -312,7 +320,7 @@ body.lb-open{overflow:hidden}
     ["G7YZtfgr3iU","Tesla Predicted Your Future","st",50]
   ];
   var CATS={all:"All",ai:"AI & VFX",sf:"Short-form",st:"Storytelling"};
-  // Videos play in a lightbox on the live site; previews that block embedded players open the source instead.
+  // Videos play inline in their card on the live site; previews that block players show a note instead.
   var framed=true;try{framed=window.self!==window.top}catch(e){}
   var canEmbed=/^https?:$/.test(location.protocol)&&!framed&&!/claude|anthropic/i.test(location.hostname);
   function fmt(s){return "0:"+(s<10?"0":"")+s;}
@@ -342,29 +350,38 @@ body.lb-open{overflow:hidden}
 
   }
 
-  var lb=null,lastFocus=null;
-  function closeLB(){ if(!lb)return; lb.remove(); lb=null; document.body.classList.remove("lb-open"); if(lastFocus)lastFocus.focus(); }
-  function openLB(src,kind,title){
-    lastFocus=document.activeElement;
-    lb=document.createElement("div");lb.className="lb";lb.setAttribute("role","dialog");lb.setAttribute("aria-modal","true");lb.setAttribute("aria-label",title||"Video player");
-    lb.innerHTML='<span class="lb-cap"></span><button type="button" class="lb-close" aria-label="Close video">✕</button><div class="lb-box '+kind+'"></div>';
-    lb.querySelector(".lb-cap").textContent=title||"";
-    var f=document.createElement("iframe");f.src=src;f.title=title||"Video player";
-    f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write";f.referrerPolicy="strict-origin-when-cross-origin";f.allowFullscreen=true;
-    lb.querySelector(".lb-box").appendChild(f);
-    lb.addEventListener("click",function(e){ if(e.target===lb||e.target.closest(".lb-close"))closeLB(); });
-    document.body.appendChild(lb);document.body.classList.add("lb-open");
-    lb.querySelector(".lb-close").focus();
+  var current=null;
+  function stopCurrent(){ if(!current)return; var c=current; current=null;
+    var f=c.box.querySelector("iframe.inl"); if(f)f.remove();
+    c.el.classList.remove("is-playing","is-ig"); delete c.el.dataset.playing; }
+  function boxFor(el){ return el.classList.contains("player")?el:(el.querySelector(".vt")||el.querySelector(".thumb")); }
+  function srcFor(el){
+    if(el.dataset.yt) return "https://www.youtube-nocookie.com/embed/"+el.dataset.yt+"?autoplay=1&rel=0&playsinline=1&modestbranding=1";
+    if(el.dataset.ig) return "https://www.instagram.com/reel/"+el.dataset.ig+"/embed/";
+    if(el.dataset.drive) return "https://drive.google.com/file/d/"+el.dataset.drive+"/preview";
   }
-  document.addEventListener("keydown",function(e){ if(e.key==="Escape")closeLB(); });
+  function playInline(el){
+    stopCurrent();
+    var box=boxFor(el), f=document.createElement("iframe");
+    f.className="inl"; f.src=srcFor(el); f.title=el.dataset.title||"Video player";
+    f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen; clipboard-write";
+    f.referrerPolicy="strict-origin-when-cross-origin"; f.allowFullscreen=true;
+    if(el.dataset.ig) el.classList.add("is-ig");
+    el.classList.add("is-playing"); el.dataset.playing="1";
+    box.appendChild(f); current={el:el,box:box};
+  }
+  function previewNote(el){
+    var box=boxFor(el); if(box.querySelector(".pv-note"))return;
+    var n=document.createElement("span"); n.className="pv-note";
+    n.textContent="Videos play inside the page on rezajafariedit.github.io. This preview can't show video players.";
+    box.appendChild(n); setTimeout(function(){n.remove()},4000);
+  }
   document.addEventListener("click",function(e){
-    if(!canEmbed)return;
-    var el=e.target.closest("[data-yt],[data-ig],[data-drive]");if(!el||(lb&&lb.contains(el)))return;
+    var el=e.target.closest("[data-yt],[data-ig],[data-drive]"); if(!el)return;
     e.preventDefault();
-    var t=el.dataset.title;
-    if(el.dataset.yt) openLB("https://www.youtube-nocookie.com/embed/"+el.dataset.yt+"?autoplay=1&rel=0&playsinline=1&modestbranding=1", el.dataset.short?"tall":"wide", t);
-    else if(el.dataset.ig) openLB("https://www.instagram.com/reel/"+el.dataset.ig+"/embed/","ig",t);
-    else if(el.dataset.drive) openLB("https://drive.google.com/file/d/"+el.dataset.drive+"/preview","wide",t);
+    if(el.dataset.playing)return;
+    if(!canEmbed){ previewNote(el); return; }
+    playInline(el);
   });
 
   var cb=document.getElementById("copyBtn");

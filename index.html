@@ -209,7 +209,7 @@ body.lb-open{overflow:hidden}
 .shorts.four{grid-template-columns:repeat(4,1fr)}
 
 /* inline playback */
-iframe.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;background:#000}
+iframe.inl,video.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;background:#000;object-fit:contain}
 .is-playing .play,.is-playing .badge,.is-playing .big,.is-playing .ptitle{display:none}
 .is-playing{cursor:default}
 .card.is-ig .thumb{aspect-ratio:4/5}
@@ -313,7 +313,7 @@ iframe.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;b
 
   <div class="frame">
     <div class="framebar"><span class="rec">REZA JAFARI / SHOWREEL</span><span>HOOK → STORY → PAYOFF</span></div>
-    <a class="player reel2" href="https://drive.google.com/file/d/1sLpiJFkWKjy4eFy_pAUwc15vaALIOCes/view?usp=sharing" target="_blank" rel="noopener" data-drive="1sLpiJFkWKjy4eFy_pAUwc15vaALIOCes" data-title="Showreel" aria-label="Play the 37-second showreel">
+    <a class="player reel2" href="showreel.mp4" data-video="showreel.mp4" data-title="Showreel" aria-label="Play the 37-second showreel">
       <img class="cover" src="showreel-cover.webp" alt="Showreel — Video editing portfolio, Reza Jafari">
       <span class="pill" aria-hidden="true"><span class="pi"></span>Play showreel · 0:37</span>
     </a>
@@ -472,7 +472,7 @@ iframe.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;b
 
   var current=null;
   function stopCurrent(){ if(!current)return; var c=current; current=null;
-    var f=c.box.querySelector("iframe.inl"); if(f)f.remove();
+    var f=c.box.querySelector(".inl"); if(f){ if(f.pause)f.pause(); f.remove(); }
     c.el.classList.remove("is-playing","is-ig"); delete c.el.dataset.playing; }
   function boxFor(el){ return el.classList.contains("player")?el:(el.querySelector(".vt")||el.querySelector(".thumb")); }
   function srcFor(el){
@@ -490,6 +490,14 @@ iframe.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;b
     el.classList.add("is-playing"); el.dataset.playing="1";
     box.appendChild(f); current={el:el,box:box};
   }
+  function playVideo(el){
+    stopCurrent();
+    var box=boxFor(el), v=document.createElement("video");
+    v.className="inl"; v.src=el.dataset.video; v.controls=true; v.playsInline=true; v.setAttribute("playsinline",""); v.preload="auto";
+    el.classList.add("is-playing"); el.dataset.playing="1";
+    box.appendChild(v); current={el:el,box:box};
+    var p=v.play(); if(p&&p.catch)p.catch(function(){});
+  }
   function previewNote(el){
     var box=boxFor(el); if(box.querySelector(".pv-note"))return;
     var n=document.createElement("span"); n.className="pv-note";
@@ -497,9 +505,10 @@ iframe.inl{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:6;b
     box.appendChild(n); setTimeout(function(){n.remove()},4000);
   }
   document.addEventListener("click",function(e){
-    var el=e.target.closest("[data-yt],[data-ig],[data-drive]"); if(!el)return;
+    var el=e.target.closest("[data-yt],[data-ig],[data-drive],[data-video]"); if(!el)return;
     e.preventDefault();
     if(el.dataset.playing)return;
+    if(el.dataset.video){ playVideo(el); return; }
     if(!canEmbed){ previewNote(el); return; }
     playInline(el);
   });
